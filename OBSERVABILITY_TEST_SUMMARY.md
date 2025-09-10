@@ -94,3 +94,146 @@ kubectl delete namespace nim-test-workload
 5. **Load Testing** - Scale up the deployment replicas to generate more load if needed
 
 The workload will continue running and generating realistic embedding traffic to help you validate and tune your observability setup!
+
+Here’s a clean **Markdown** version ready for a README file:
+
+````markdown
+# Viewing Test Data in Grafana
+
+Follow the steps below to access and explore your test data in Grafana.
+
+---
+
+## 1) Access Grafana
+
+- **If you have NodePort exposed:**
+  - URL: `http://<any-cluster-node-ip>:32222`
+
+- **Or via the kube-prom stack service port-forward:**
+  ```bash
+  kubectl -n monitoring port-forward svc/kube-prometheus-stack-1741309824-grafana 3000:80
+````
+
+Then open [http://localhost:3000](http://localhost:3000)
+
+---
+
+## 2) Add Prometheus as a Data Source (if not already configured)
+
+* In Grafana:
+  `Settings (gear)` → `Data sources` → `Add data source` → `Prometheus`
+* URL:
+  `http://prometheus-operated.monitoring.svc.cluster.local:9090`
+* Click **Save & test**
+
+---
+
+## 3) Import the Ready-Made Dashboard
+
+* In Grafana:
+  `Dashboards` → `New` → `Import`
+* Upload:
+  `grafana-dashboards/nim_embedding_observability.json`
+  *(from this machine)* or paste its JSON content.
+* Select your **Prometheus data source** when prompted.
+
+---
+
+## 4) Explore Useful Prometheus Queries in Grafana’s Explore Tab
+
+* Triton requests success over time:
+
+  ```promql
+  sum by (model) (rate(nv_inference_request_success[5m]))
+  ```
+* Triton failures over time:
+
+  ```promql
+  sum by (model) (rate(nv_inference_request_failure[5m]))
+  ```
+* Inference count rate:
+
+  ```promql
+  sum by (model) (rate(nv_inference_count[5m]))
+  ```
+* Request duration (convert µs to s if needed):
+
+  ```promql
+  rate(nv_inference_request_duration_us[5m]) / 1e6
+  ```
+* GPU utilization:
+
+  ```promql
+  avg by (device_id) (gpu_utilization)
+  ```
+* GPU power (watts):
+
+  ```promql
+  avg by (device_id) (gpu_power_usage_watts) / 1000
+  ```
+
+---
+
+## 5) Correlate with NIM Service Metrics
+
+The NIM service also exposes metrics (Python process/runtime, GPU metrics). Some handy examples:
+
+* Process CPU seconds total:
+
+  ```promql
+  rate(process_cpu_seconds_total[5m])
+  ```
+* Memory RSS:
+
+  ```promql
+  process_resident_memory_bytes
+  ```
+* GPU total energy:
+
+  ```promql
+  rate(gpu_total_energy_consumption_joules[5m])
+  ```
+
+---
+
+## 6) Optional: Filter to Your Specific Model or Namespace
+
+You can add Grafana variables to filter by model label. For example:
+
+* Variable query:
+
+  ```promql
+  label_values(nv_inference_request_success, model)
+  ```
+* Use it in panel queries:
+
+  ```promql
+  sum by (model) (rate(nv_inference_request_success{model=~"$model"}[5m]))
+  ```
+
+---
+
+## 7) Validate Data is Flowing
+
+You should see:
+
+* Success counters increasing
+* Non-zero rates for `nv_inference_count` and `nv_inference_exec_count`
+* GPU utilization and power changing during requests
+
+If rates are flat, wait a minute for rate windows to populate or reduce your request interval:
+
+```bash
+kubectl patch configmap -n nim-test-workload nim-embedding-test-config --patch '{"data":{"REQUEST_INTERVAL":"5"}}'
+kubectl rollout restart deployment -n nim-test-workload nim-embedding-test
+```
+
+---
+
+✅ At this point, your Grafana should be ready to explore test data.
+*(Optionally, you can also port-forward Grafana from this terminal and confirm the dashboard import.)*
+
+```
+
+Do you want me to also **add screenshots placeholders** (e.g., `![Grafana Dashboard](./images/grafana-dashboard.png)`) to make the README more visual?
+```
