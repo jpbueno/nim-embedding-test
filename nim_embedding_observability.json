@@ -1,82 +1,572 @@
 {
-  "title": "NIM Embedding Observability",
-  "schemaVersion": 38,
-  "version": 1,
-  "timezone": "browser",
-  "editable": true,
-  "panels": [
-    {
-      "type": "stat",
-      "title": "Inference Requests (Success)",
-      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
-      "targets": [
-        { "expr": "sum(nv_inference_request_success)" }
-      ]
+  "dashboard": {
+    "id": null,
+    "title": "NIM Embedding Observability",
+    "tags": ["nim", "embedding", "observability"],
+    "style": "dark",
+    "timezone": "browser",
+    "editable": true,
+    "graphTooltip": 0,
+    "time": {
+      "from": "now-15m",
+      "to": "now"
     },
-    {
-      "type": "stat",
-      "title": "Inference Requests (Failure)",
-      "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
-      "targets": [
-        { "expr": "sum(nv_inference_request_failure)" }
-      ]
-    },
-    {
-      "type": "timeSeries",
-      "title": "Requests Over Time",
-      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
-      "targets": [
-        { "expr": "sum by (model) (rate(nv_inference_request_success[5m]))" },
-        { "expr": "sum by (model) (rate(nv_inference_request_failure[5m]))" }
-      ]
-    },
-    {
-      "type": "timeSeries",
-      "title": "Inference Count",
-      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
-      "targets": [
-        { "expr": "sum by (model) (rate(nv_inference_count[5m]))" }
-      ]
-    },
-    {
-      "type": "timeSeries",
-      "title": "Request Duration (Triton)",
-      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
-      "targets": [
-        { "expr": "sum by (model) (rate(nv_inference_request_duration_us[5m]))" }
-      ]
-    },
-    {
-      "type": "timeSeries",
-      "title": "GPU Utilization",
-      "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 },
-      "targets": [
-        { "expr": "avg by (device_id) (gpu_utilization)" }
-      ]
-    },
-    {
-      "type": "timeSeries",
-      "title": "GPU Power (W)",
-      "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
-      "targets": [
-        { "expr": "avg by (device_id) (gpu_power_usage_watts / 1000)" }
-      ]
-    },
-    {
-      "type": "stat",
-      "title": "Embedding Test Success Rate",
-      "gridPos": { "x": 0, "y": 20, "w": 6, "h": 4 },
-      "targets": [
-        { "expr": "sum(nv_inference_request_success) / (sum(nv_inference_request_success) + sum(nv_inference_request_failure))" }
-      ]
-    },
-    {
-      "type": "stat",
-      "title": "Current Embedding Dimensionality (from logs)",
-      "gridPos": { "x": 6, "y": 20, "w": 6, "h": 4 },
-      "targets": [
-        { "expr": "scalar(2048)" }
-      ]
-    }
-  ]
+    "refresh": "30s",
+    "schemaVersion": 38,
+    "version": 1,
+    "panels": [
+      {
+        "id": 1,
+        "title": "Total Successful Inference Requests",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(nv_inference_request_success)",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 0,
+          "y": 0
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 10,
+              "gradientMode": "none",
+              "hideFrom": {
+                "graph": false,
+                "legend": false,
+                "tooltip": false,
+                "vis": false
+              },
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "never",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "none"
+          }
+        },
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "values": false,
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": ""
+          },
+          "textMode": "auto"
+        }
+      },
+      {
+        "id": 2,
+        "title": "Total Failed Inference Requests",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(nv_inference_request_failure)",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 6,
+          "y": 0
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 1
+                }
+              ]
+            },
+            "unit": "none"
+          }
+        },
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "values": false,
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": ""
+          },
+          "textMode": "auto"
+        }
+      },
+      {
+        "id": 3,
+        "title": "GPU Utilization",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "avg(gpu_utilization)",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 12,
+          "y": 0
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "yellow",
+                  "value": 70
+                },
+                {
+                  "color": "red",
+                  "value": 90
+                }
+              ]
+            },
+            "unit": "percent"
+          }
+        },
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "values": false,
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": ""
+          },
+          "textMode": "auto"
+        }
+      },
+      {
+        "id": 4,
+        "title": "Embedding Dimensions",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "2048",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 18,
+          "y": 0
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            },
+            "unit": "none"
+          }
+        },
+        "options": {
+          "colorMode": "value",
+          "graphMode": "none",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "values": false,
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": ""
+          },
+          "textMode": "auto"
+        }
+      },
+      {
+        "id": 5,
+        "title": "Inference Request Rate (per second)",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "sum by (model) (rate(nv_inference_request_success[5m]))",
+            "refId": "A",
+            "legendFormat": "Success - {{model}}"
+          },
+          {
+            "expr": "sum by (model) (rate(nv_inference_request_failure[5m]))",
+            "refId": "B",
+            "legendFormat": "Failure - {{model}}"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 4
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 10,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "vis": false
+              },
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "never",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                }
+              ]
+            },
+            "unit": "reqps"
+          }
+        },
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom"
+          },
+          "tooltip": {
+            "mode": "single"
+          }
+        }
+      },
+      {
+        "id": 6,
+        "title": "Total Inference Count Rate",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "sum by (model) (rate(nv_inference_count[5m]))",
+            "refId": "A",
+            "legendFormat": "{{model}}"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 4
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 10,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "vis": false
+              },
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "never",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                }
+              ]
+            },
+            "unit": "ops"
+          }
+        },
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom"
+          },
+          "tooltip": {
+            "mode": "single"
+          }
+        }
+      },
+      {
+        "id": 7,
+        "title": "GPU Utilization Over Time",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "avg by (device_id) (gpu_utilization)",
+            "refId": "A",
+            "legendFormat": "GPU {{device_id}}"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 12
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 10,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "vis": false
+              },
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "never",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "max": 100,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "yellow",
+                  "value": 70
+                },
+                {
+                  "color": "red",
+                  "value": 90
+                }
+              ]
+            },
+            "unit": "percent"
+          }
+        },
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom"
+          },
+          "tooltip": {
+            "mode": "single"
+          }
+        }
+      },
+      {
+        "id": 8,
+        "title": "Request Duration (microseconds)",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "sum by (model) (rate(nv_inference_request_duration_us[5m]))",
+            "refId": "A",
+            "legendFormat": "{{model}}"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 12
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 10,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "vis": false
+              },
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "never",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                }
+              ]
+            },
+            "unit": "µs"
+          }
+        },
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom"
+          },
+          "tooltip": {
+            "mode": "single"
+          }
+        }
+      }
+    ]
+  }
 }
