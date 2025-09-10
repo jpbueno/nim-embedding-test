@@ -231,9 +231,3 @@ kubectl rollout restart deployment -n nim-test-workload nim-embedding-test
 ---
 
 ✅ At this point, your Grafana should be ready to explore test data.
-*(Optionally, you can also port-forward Grafana from this terminal and confirm the dashboard import.)*
-
-```
-
-Do you want me to also **add screenshots placeholders** (e.g., `![Grafana Dashboard](./images/grafana-dashboard.png)`) to make the README more visual?
-```
