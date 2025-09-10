@@ -1,0 +1,82 @@
+{
+  "title": "NIM Embedding Observability",
+  "schemaVersion": 38,
+  "version": 1,
+  "timezone": "browser",
+  "editable": true,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Inference Requests (Success)",
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+      "targets": [
+        { "expr": "sum(nv_inference_request_success)" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Inference Requests (Failure)",
+      "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
+      "targets": [
+        { "expr": "sum(nv_inference_request_failure)" }
+      ]
+    },
+    {
+      "type": "timeSeries",
+      "title": "Requests Over Time",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "sum by (model) (rate(nv_inference_request_success[5m]))" },
+        { "expr": "sum by (model) (rate(nv_inference_request_failure[5m]))" }
+      ]
+    },
+    {
+      "type": "timeSeries",
+      "title": "Inference Count",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "sum by (model) (rate(nv_inference_count[5m]))" }
+      ]
+    },
+    {
+      "type": "timeSeries",
+      "title": "Request Duration (Triton)",
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "sum by (model) (rate(nv_inference_request_duration_us[5m]))" }
+      ]
+    },
+    {
+      "type": "timeSeries",
+      "title": "GPU Utilization",
+      "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "avg by (device_id) (gpu_utilization)" }
+      ]
+    },
+    {
+      "type": "timeSeries",
+      "title": "GPU Power (W)",
+      "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "avg by (device_id) (gpu_power_usage_watts / 1000)" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Embedding Test Success Rate",
+      "gridPos": { "x": 0, "y": 20, "w": 6, "h": 4 },
+      "targets": [
+        { "expr": "sum(nv_inference_request_success) / (sum(nv_inference_request_success) + sum(nv_inference_request_failure))" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Current Embedding Dimensionality (from logs)",
+      "gridPos": { "x": 6, "y": 20, "w": 6, "h": 4 },
+      "targets": [
+        { "expr": "scalar(2048)" }
+      ]
+    }
+  ]
+}
